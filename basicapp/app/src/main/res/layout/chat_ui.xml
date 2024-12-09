@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- 받은 메시지를 표시할 텍스트뷰 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <TextView
+            android:id="@+id/tvReceivedMessages"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            android:text="Received messages will appear here."
+            android:textSize="16sp" />
+    </ScrollView>
+
+    <!-- 메시지를 입력할 EditText -->
+    <EditText
+        android:id="@+id/edtMessage"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Enter your message"
+        android:padding="8dp"
+        android:textSize="16sp" />
+
+    <!-- 메시지를 전송할 버튼 -->
+    <Button
+        android:id="@+id/btnSendMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Send Message"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp" />
+</LinearLayout>

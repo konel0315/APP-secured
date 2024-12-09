@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- 사용자 이름 표시 -->
+    <TextView
+        android:id="@+id/textViewUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Username"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginTop="32dp" />
+
+    <!-- 개인 정보 등 다른 내용들을 여기에 추가할 수 있습니다 -->
+    <!-- 예시로 "Personal Information"을 추가 -->
+    <TextView
+        android:id="@+id/textViewPersonalInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Personal Information"
+        android:textSize="16sp"
+        android:layout_marginTop="24dp" />
+
+    <!-- 로그아웃 버튼 -->
+    <Button
+        android:id="@+id/buttonLogout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/logout"
+        android:backgroundTint="#6200EE"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:layout_marginTop="24dp" />
+
+    <!-- 추가적인 버튼이나 정보를 여기에 배치할 수 있습니다 -->
+
+</LinearLayout>

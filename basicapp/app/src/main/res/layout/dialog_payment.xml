@@ -1,0 +1,28 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/edt_card_number"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="카드 번호 (16자리)"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/edt_expiry_date"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="유효기간 (MM/YY)"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/edt_cvc"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="CVC (3자리)"
+        android:inputType="number" />
+</LinearLayout>

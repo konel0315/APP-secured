@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">basicapp</string>
+    <string name="hint_password">비밀번호를 입력하세요</string>
+    <string name="hint_email">아이디를 입력하세요</string>
+    <string name="text_login">로그인</string>
+    <string name="text_sign">회원가입</string>
+    <string name="password">password</string>
+    <string name="email">Identification</string>
+    <string name="ID_input">아이디 입력</string>
+    <string name="duplication">중복확인</string>
+    <string name="password_input">비밀번호 입력</string>
+    <string name="logout">로그아웃</string>
+    <string name="server_ip">222.107.221.29</string>
+</resources>

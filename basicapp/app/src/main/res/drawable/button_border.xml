@@ -1,0 +1,13 @@
+<!-- res/drawable/button_border.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 내부 배경 색 -->
+    <solid android:color="#DB7AC4" />
+
+    <!-- 윤곽선 색과 두께 설정 -->
+    <stroke
+        android:color="#B14FAC"
+    android:width="5dp" />   <!-- 윤곽선 두께 -->
+
+    <!-- 모서리 둥글게 처리 -->
+    <corners android:radius="16dp" />
+</shape>

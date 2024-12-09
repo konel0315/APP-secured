@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#DB7AC4"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+
+    <FrameLayout
+        android:layout_width="352dp"
+        android:layout_height="384dp">
+
+        <!-- 이미지의 배경을 액자처럼 설정 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="150dp"
+            android:scaleType="centerCrop"
+            android:textSize="25sp"
+            android:text="모두의 소개팅" />
+        <Button
+            android:id="@+id/loginButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:backgroundTint="#DB7AC4"
+            android:layout_marginTop="60dp"
+            android:text="&lt; 로그인 &gt;"
+            android:textColor="#BD17A2"/>
+
+        <ImageView
+            android:layout_width="287dp"
+            android:layout_height="275dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:layout_marginTop="50dp"
+            android:src="@drawable/circle_shape_back" />
+
+        <!-- 실제 이미지 -->
+        <ImageView
+            android:id="@+id/centerImage"
+            android:layout_width="257dp"
+            android:layout_height="252dp"
+            android:layout_gravity="center"
+            android:background="@drawable/circle_shape"
+            android:clipToOutline="true"
+            android:layout_marginTop="50dp"
+            android:contentDescription="센터 이미지"
+            android:scaleType="centerCrop"
+            android:src="@drawable/sample_image" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="225dp"
+        android:layout_height="93dp"
+        android:layout_marginTop="50dp">
+
+
+        <ImageView
+            android:layout_width="115dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:src="@drawable/circle_shape_back" />
+
+        <!-- 실제 버튼 -->
+        <Button
+            android:id="@+id/matchButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:backgroundTint="#DB7AC4"
+            android:text="랜덤 매칭"
+            android:textColor="#BD17A2" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="225dp"
+        android:layout_height="93dp">
+
+
+        <ImageView
+            android:layout_width="115dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:src="@drawable/circle_shape_back" />
+
+        <!-- 실제 버튼 -->
+        <Button
+            android:id="@+id/paymentButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:backgroundTint="#DB7AC4"
+            android:text="재화 충전"
+            android:textColor="#BD17A2" />
+
+    </FrameLayout>
+
+</LinearLayout>
