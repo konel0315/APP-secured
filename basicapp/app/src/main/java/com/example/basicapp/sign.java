@@ -19,6 +19,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+
 public class sign extends AppCompatActivity {
 
     private EditText emailEditText;
@@ -86,7 +89,7 @@ public class sign extends AppCompatActivity {
     }
 
     private void checkIdDuplicate() {
-        String urlString = "http://" + getString(R.string.server_ip) + ":8080/api/question/check";  // 서버 URL
+        String urlString = "https://" + getString(R.string.server_ip) + ":8443/api/question/check";  // 서버 URL
         String username = emailEditText.getText().toString().trim();  // 이메일 입력값
 
         // JSON 데이터 생성
@@ -97,8 +100,14 @@ public class sign extends AppCompatActivity {
         try {
             // 서버 URL 연결
             URL url = new URL(urlString);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 
+            // SSLContext 설정 (서버 인증서를 신뢰하도록)
+            SSLContext sslContext = SSLUtill.createSSLContext(sign.this);
+            if (sslContext != null) {
+                conn.setSSLSocketFactory(sslContext.getSocketFactory());
+            }
+            conn.setHostnameVerifier((hostname, session) -> true); // 호스트 이름 검증 비활성화
             // HTTP 요청 설정
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json; utf-8");
@@ -148,7 +157,7 @@ public class sign extends AppCompatActivity {
     }
 
     private void sendPostRequest() {
-        String urlString = "http://" + getString(R.string.server_ip) + ":8080/api/question/sign";  // 서버 URL
+        String urlString = "https://" + getString(R.string.server_ip) + ":8443/api/question/sign";  // 서버 URL
         String username = emailEditText.getText().toString().trim();  // 이메일 입력값
         String password = passwordEditText.getText().toString().trim();  // 비밀번호 입력값
 
@@ -161,8 +170,15 @@ public class sign extends AppCompatActivity {
         try {
             // 서버 URL 연결
             URL url = new URL(urlString);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 
+            // SSLContext 설정 (서버 인증서를 신뢰하도록)
+            SSLContext sslContext = SSLUtill.createSSLContext(sign.this);
+            if (sslContext != null) {
+                conn.setSSLSocketFactory(sslContext.getSocketFactory());
+            }
+
+            conn.setHostnameVerifier((hostname, session) -> true); // 호스트 이름 검증 비활성화
             // HTTP 요청 설정
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json; utf-8");

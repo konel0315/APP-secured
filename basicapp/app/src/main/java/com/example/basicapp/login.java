@@ -59,7 +59,7 @@ public class login extends AppCompatActivity {
     }
 
     private void sendPostRequest() {
-        String urlString = "http://" + getString(R.string.server_ip) + ":8080/api/question/login";;  // 서버 URL (비워둠)
+        String urlString = "http://" + getString(R.string.server_ip) + ":8443/api/question/login";;  // 서버 URL (비워둠)
         String username = emailEditText.getText().toString().trim();  // 이메일 입력값
         String password = passwordEditText.getText().toString().trim();  // 비밀번호 입력값
 
