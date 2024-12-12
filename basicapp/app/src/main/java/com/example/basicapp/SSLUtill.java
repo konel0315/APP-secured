@@ -10,7 +10,9 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 public class SSLUtill {
 
@@ -42,5 +44,22 @@ public class SSLUtill {
             e.printStackTrace();
             return null;
         }
+    }
+
+    // 추가: TrustManager 반환 메서드
+    public static X509TrustManager getTrustManager(SSLContext sslContext) {
+        try {
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init((KeyStore) null);
+
+            for (TrustManager tm : tmf.getTrustManagers()) {
+                if (tm instanceof X509TrustManager) {
+                    return (X509TrustManager) tm;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null; // X509TrustManager를 찾지 못한 경우 null 반환
     }
 }

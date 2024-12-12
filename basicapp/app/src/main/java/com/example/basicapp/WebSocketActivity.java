@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONObject;
 import org.json.JSONException;
 
+import javax.net.ssl.SSLContext;
+
 public class WebSocketActivity extends AppCompatActivity {
 
     private static final String TAG = "WebSocketActivity";
@@ -38,10 +40,22 @@ public class WebSocketActivity extends AppCompatActivity {
         dbHelper = new DBHelper(this);
 
         Button btnSendMessage = findViewById(R.id.btnSendMessage);
-        client = new OkHttpClient();
+
+        // SSLContext 생성
+        SSLContext sslContext = SSLUtill.createSSLContext(this);
+        if (sslContext == null) {
+            Log.e(TAG, "Failed to create SSLContext");
+            return;
+        }
+
+        // OkHttpClient 설정
+        client = new OkHttpClient.Builder()
+                .sslSocketFactory(sslContext.getSocketFactory(), SSLUtill.getTrustManager(sslContext)) // SSL 설정
+                .hostnameVerifier((hostname, session) -> true) // 테스트용, 운영 환경에서는 적절한 검증을 추가
+                .build();
 
         Request request = new Request.Builder()
-                .url("ws://" + getString(R.string.server_ip) + ":8080/chat")
+                .url("wss://" + getString(R.string.server_ip) + ":8443/chat") // wss 프로토콜 사용
                 .build();
 
         WebSocketListener listener = new WebSocketListener() {
@@ -53,6 +67,7 @@ public class WebSocketActivity extends AppCompatActivity {
                 try {
                     jsonM.put("type", "check");
                     jsonM.put("message", user);
+                    jsonM.put("Authorization", "your-fixed-secret-key-12345");
                 } catch (JSONException e) {
                     Log.e(TAG, "JSON error: " + e.getMessage());
                 }
@@ -101,6 +116,7 @@ public class WebSocketActivity extends AppCompatActivity {
                     jsonMessage.put("type", "chat");
                     jsonMessage.put("username", user);
                     jsonMessage.put("message", message);
+                    jsonMessage.put("Authorization", "your-fixed-secret-key-12345");
                     dbHelper.saveMessage("You", message);
                     webSocket.send(jsonMessage.toString());
                     edtMessage.setText("");
@@ -158,6 +174,7 @@ public class WebSocketActivity extends AppCompatActivity {
             try {
                 jsonM.put("type", "out");
                 jsonM.put("message", user);
+                jsonM.put("Authorization", "your-fixed-secret-key-12345");
             } catch (JSONException e) {
                 Log.e(TAG, "JSON error: " + e.getMessage());
             }

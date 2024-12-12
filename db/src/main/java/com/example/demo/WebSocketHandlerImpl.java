@@ -22,11 +22,23 @@ public class WebSocketHandlerImpl extends TextWebSocketHandler {
     // 사용자 카운트 (순차 매칭을 위해 사용)
     private static int userCount = 0;
 
+    // 고정된 토큰
+    private static final String FIXED_TOKEN = "your-fixed-secret-key-12345";
+
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String clientMessage = message.getPayload();
         JSONObject jsonMessage = new JSONObject(clientMessage);
         String type = jsonMessage.getString("type");
+
+        // 고정된 토큰 검증
+        String fixedToken = jsonMessage.optString("Authorization", null);
+        if (fixedToken == null || !fixedToken.equals(FIXED_TOKEN)) {
+            // 토큰이 없거나 잘못된 경우 처리
+            session.sendMessage(new TextMessage("Invalid fixed token."));
+            session.close();
+            return;
+        }
 
         if ("check".equals(type)) { // 사용자 등록 및 방 배정
             String username = jsonMessage.getString("message");

@@ -3,8 +3,8 @@
   <component name="deploymentTargetSelector">
     <selectionStates>
       <SelectionState runConfigName="app">
-        <option name="selectionMode" value="DIALOG" />
-        <DropdownSelection timestamp="2024-12-09T19:36:45.025813400Z">
+        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2024-12-12T20:23:33.110929500Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\konel\.android\avd\Copy_of_Medium_Phone_API_35_2.avd" />
@@ -15,7 +15,7 @@
           <targets>
             <Target type="DEFAULT_BOOT">
               <handle>
-                <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\konel\.android\avd\Copy_of_Medium_Phone_API_35_2.avd" />
+                <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\konel\.android\avd\Medium_Phone.avd" />
               </handle>
             </Target>
           </targets>

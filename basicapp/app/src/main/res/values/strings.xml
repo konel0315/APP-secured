@@ -10,5 +10,5 @@
     <string name="duplication">중복확인</string>
     <string name="password_input">비밀번호 입력</string>
     <string name="logout">로그아웃</string>
-    <string name="server_ip">222.107.221.29</string>
+    <string name="server_ip">222.107.221.87</string>
 </resources>

@@ -8,7 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.example.demo", "com.example.payment"})
+@ComponentScan(basePackages = {"com.example.demo", "com.example.payment","com.example.token"})
 public class DbApplication {
 
     public static void main(String[] args) {

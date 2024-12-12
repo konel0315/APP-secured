@@ -111,6 +111,7 @@ public class sign extends AppCompatActivity {
             // HTTP 요청 설정
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json; utf-8");
+            conn.setRequestProperty("Authorization", "your-fixed-secret-key-12345");
             conn.setDoOutput(true);  // Output stream 사용
 
             // JSON 데이터 전송
@@ -182,6 +183,7 @@ public class sign extends AppCompatActivity {
             // HTTP 요청 설정
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json; utf-8");
+            conn.setRequestProperty("Authorization", "your-fixed-secret-key-12345");
             conn.setDoOutput(true);  // Output stream 사용
 
             // JSON 데이터 전송

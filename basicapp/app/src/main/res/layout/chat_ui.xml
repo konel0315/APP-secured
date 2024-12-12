@@ -17,6 +17,7 @@
             android:padding="8dp"
             android:text="Received messages will appear here."
             android:textSize="16sp" />
+
     </ScrollView>
 
     <!-- 메시지를 입력할 EditText -->
