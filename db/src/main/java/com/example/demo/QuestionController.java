@@ -39,11 +39,17 @@ public class QuestionController {
         // 2. 요청 받은 데이터 로그 출력
         System.out.println("Received Question: " + question.getUsername() + ", " + question.getPassword());
 
-        // 3. 사용자 등록
+        // 3. 아이디 중복 확인
+        if (questionRepository.existsByUsername(question.getUsername())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+        }
+
+        // 4. 사용자 등록
         Question user = encoder.registerUser(question.getUsername(), question.getPassword());
         questionRepository.save(user); // DB에 저장
         return 0; // 저장 성공 반환
     }
+
 
     // 로그인 (POST)
     @PostMapping("/login")
