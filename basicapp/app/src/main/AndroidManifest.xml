@@ -32,6 +32,9 @@
             android:name=".sign">
         </activity>
         <activity
+            android:name=".warning">
+        </activity>
+        <activity
             android:name=".WebSocketActivity">
         </activity>
         <activity

@@ -11,7 +11,7 @@ import java.util.Date;
 public class JwtT {
 
     private static final String SECRET_KEY = "202235440_JES"; // 서명에 사용할 키
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 24시간 (밀리초 단위)
+    private static final long EXPIRATION_TIME = 1000 * 60 * 30; // 30분 (밀리초 단위)
 
     /**
      * JWT 토큰 생성

@@ -39,7 +39,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-
+    implementation ("com.google.android.recaptcha:recaptcha:18.5.1")
     implementation ("com.squareup.okhttp3:okhttp:4.10.0")
     implementation ("com.github.iamport:iamport-rest-client-java:0.2.23")
+    implementation ("com.google.android.gms:play-services-safetynet:17.0.0")
 }

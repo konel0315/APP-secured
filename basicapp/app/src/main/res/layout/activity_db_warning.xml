@@ -1,0 +1,29 @@
+<!-- res/layout/activity_db_warning.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@android:color/black"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/dbWarningMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="데이터베이스 무결성 훼손"
+        android:textColor="@android:color/holo_red_light"
+        android:textSize="24sp"
+        android:fontFamily="sans-serif-medium"
+        android:textStyle="bold"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="경고: 데이터베이스가 변조되었습니다. 보안 문제를 해결해야 합니다."
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:gravity="center" />
+
+</LinearLayout>
