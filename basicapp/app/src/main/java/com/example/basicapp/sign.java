@@ -28,64 +28,93 @@ public class sign extends AppCompatActivity {
     private EditText passwordEditText;
     private CheckBox idCheckBox;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.sign);
 
-        // 입력 칸 초기화
         emailEditText = findViewById(R.id.editTextTextEmailAddress2);
         passwordEditText = findViewById(R.id.editTextTextPassword2);
+        idCheckBox = findViewById(R.id.checkBox);
 
         Button loginButton = findViewById(R.id.registerButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // POST 요청 비동기 실행
+                // 체크박스 체크 여부 확인
                 if (!idCheckBox.isChecked()) {
-                    // 체크박스가 체크되지 않았다면 토스트 메시지로 사용자에게 알림
                     Toast.makeText(sign.this, "아이디 중복 확인을 완료해주세요.", Toast.LENGTH_SHORT).show();
-                    return; // 클릭 이벤트 종료
+                    return;
                 }
 
-                // POST 요청 비동기 실행 (체크박스가 체크된 경우만)
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        sendPostRequest();
-                    }
-                }).start();
+                // 비밀번호 검증
+                String password = passwordEditText.getText().toString().trim();
+                String validationMessage = validatePassword(password);
+
+                if (!validationMessage.isEmpty()) {
+                    // 규칙을 지키지 않았으면 Toast로 메시지 출력
+                    Toast.makeText(sign.this, validationMessage, Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                // 비밀번호 검증 통과 시 POST 요청 실행
+                new Thread(() -> sendPostRequest()).start();
             }
         });
 
-        idCheckBox = findViewById(R.id.checkBox);  // 체크박스 ID
-
-        // 체크박스 클릭 리스너 설정
+        // 체크박스 리스너 설정
         idCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                // 체크박스 클릭 시 바로 피드백을 주고 비동기 처리
                 runOnUiThread(() -> {
-                    emailEditText.setEnabled(false); // 비활성화 (UI 상 회색으로 변경됨)
-                    emailEditText.setFocusable(false); // 포커스를 받을 수 없도록 설정
-                    idCheckBox.setEnabled(false); // 체크박스를 비활성화 (중복 체크 중에 클릭 방지)
+                    emailEditText.setEnabled(false);
+                    emailEditText.setFocusable(false);
+                    idCheckBox.setEnabled(false);
                 });
-                // 새로운 스레드에서 중복 체크 요청
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        checkIdDuplicate();
-                    }
-                }).start();
+
+                new Thread(() -> checkIdDuplicate()).start();
             } else {
-                // 체크박스를 해제한 경우
                 runOnUiThread(() -> {
-                    idCheckBox.setEnabled(true); // 체크박스를 다시 활성화
-                    emailEditText.setEnabled(true); // 활성화
+                    idCheckBox.setEnabled(true);
+                    emailEditText.setEnabled(true);
                     emailEditText.setFocusableInTouchMode(true);
                 });
             }
         });
+    }
+
+    // 비밀번호 규칙 검증 메서드
+    private String validatePassword(String password) {
+        StringBuilder message = new StringBuilder();
+
+        // 비밀번호 길이 확인
+        if (password.length() < 10) {
+            message.append("비밀번호는 최소 10자리 이상이어야 합니다.\n");
+        }
+
+        // 문자 종류 확인
+        boolean hasUppercase = password.matches(".*[A-Z].*");
+        boolean hasLowercase = password.matches(".*[a-z].*");
+        boolean hasDigit = password.matches(".*\\d.*");
+        boolean hasSpecialChar = password.matches(".*[!@#$%^&*(),.?\":{}|<>].*");
+
+        int charTypeCount = 0;
+        if (hasUppercase) charTypeCount++;
+        if (hasLowercase) charTypeCount++;
+        if (hasDigit) charTypeCount++;
+        if (hasSpecialChar) charTypeCount++;
+
+        if (charTypeCount < 2) {
+            message.append("비밀번호는 두 종류 이상의 문자(대문자, 소문자, 숫자, 특수문자)를 포함해야 합니다.\n");
+        }
+
+        // 숫자로만 구성되었는지 확인
+        if (password.matches("^\\d+$")) {
+            message.append("비밀번호는 숫자로만 구성될 수 없습니다.\n");
+        }
+
+        return message.toString().trim(); // 최종 메시지를 반환
     }
 
     private void checkIdDuplicate() {
