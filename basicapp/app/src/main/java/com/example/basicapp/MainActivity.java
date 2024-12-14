@@ -60,13 +60,14 @@ public class MainActivity extends AppCompatActivity {
 
         b2.setOnClickListener(view -> {
             String token = tokenStorage.getToken(); // 클릭 시마다 최신 토큰을 가져오기
+            String nameN = tokenStorage.getUsername();
             Log.d("MainActivity", "token : " + token);
 
             if (token == null || token.isEmpty()) {
                 Toast.makeText(getApplicationContext(), "토큰이 없습니다. 로그인해주세요.", Toast.LENGTH_SHORT).show();
             } else {
                 verifyToken(token, (isValid, username) -> {
-                    if (isValid) {
+                    if (isValid&&username.equals(nameN)) {
                         // username이 유효한 경우
                         Log.d("MainActivity", "유효한 사용자: " + username);
                         navigateToWebSocketActivity();

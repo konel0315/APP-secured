@@ -32,7 +32,6 @@ public class sign extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.sign);
 
         emailEditText = findViewById(R.id.editTextTextEmailAddress2);
@@ -40,31 +39,26 @@ public class sign extends AppCompatActivity {
         idCheckBox = findViewById(R.id.checkBox);
 
         Button loginButton = findViewById(R.id.registerButton);
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 체크박스 체크 여부 확인
-                if (!idCheckBox.isChecked()) {
-                    Toast.makeText(sign.this, "아이디 중복 확인을 완료해주세요.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+        loginButton.setOnClickListener(v -> {
+            if (!idCheckBox.isChecked()) {
+                Toast.makeText(sign.this, "아이디 중복 확인을 완료해주세요.", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                // 비밀번호 검증
-                String password = passwordEditText.getText().toString().trim();
-                String validationMessage = validatePassword(password);
+            String password = passwordEditText.getText().toString().trim();
+            String validationMessage = validatePassword(password);
 
-                if (!validationMessage.isEmpty()) {
-                    // 규칙을 지키지 않았으면 Toast로 메시지 출력
-                    Toast.makeText(sign.this, validationMessage, Toast.LENGTH_LONG).show();
-                    return;
-                }
+            if (!validationMessage.isEmpty()) {
+                Toast.makeText(sign.this, validationMessage, Toast.LENGTH_LONG).show();
+                return;
+            }
 
-                // 비밀번호 검증 통과 시 POST 요청 실행
-                new Thread(() -> sendPostRequest()).start();
+            // 중복 아이디 확인
+            if (duplipost() == 1) {
+                new Thread(this::sendPostRequest).start();
             }
         });
 
-        // 체크박스 리스너 설정
         idCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 runOnUiThread(() -> {
@@ -72,8 +66,7 @@ public class sign extends AppCompatActivity {
                     emailEditText.setFocusable(false);
                     idCheckBox.setEnabled(false);
                 });
-
-                new Thread(() -> checkIdDuplicate()).start();
+                new Thread(this::checkIdDuplicate).start();
             } else {
                 runOnUiThread(() -> {
                     idCheckBox.setEnabled(true);
@@ -186,6 +179,71 @@ public class sign extends AppCompatActivity {
         }
     }
 
+    private int duplipost() {
+        String urlString = "https://" + getString(R.string.server_ip) + ":8443/api/question/token";  // 서버 URL
+        String username = emailEditText.getText().toString().trim();  // 이메일 입력값
+
+        // JSON 데이터 생성
+        String jsonData = "{\n" +
+                "    \"username\": \"" + username + "\"\n" +
+                "}";
+
+        try {
+            // 서버 URL 연결
+            URL url = new URL(urlString);
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+
+            // SSLContext 설정 (서버 인증서를 신뢰하도록)
+            SSLContext sslContext = SSLUtill.createSSLContext(sign.this);
+            if (sslContext != null) {
+                conn.setSSLSocketFactory(sslContext.getSocketFactory());
+            }
+
+            conn.setHostnameVerifier((hostname, session) -> true); // 호스트 이름 검증 비활성화
+            // HTTP 요청 설정
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json; utf-8");
+            conn.setRequestProperty("Authorization", "your-fixed-secret-key-12345");
+            conn.setDoOutput(true);  // Output stream 사용
+
+            // JSON 데이터 전송
+            OutputStream os = conn.getOutputStream();
+            os.write(jsonData.getBytes(StandardCharsets.UTF_8));  // UTF-8로 인코딩하여 전송
+            os.flush();
+            os.close();
+
+            // 응답 코드 확인
+            int responseCode = conn.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // 서버 응답 처리
+                InputStream inputStream = conn.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                // 서버 응답을 확인하고, 성공 메시지 표시
+                if (response.toString().equals("0")) {
+                    return 1;  // 중복되지 않으면 1 반환
+                } else {
+                    return 0;  // 중복되면 0 반환
+                }
+            } else {
+                // 응답 실패
+                Log.e("PostRequestError", "POST 요청 실패: 응답 코드 " + responseCode);
+                return 0;
+            }
+
+        } catch (Exception e) {
+            // 예외 발생 시 로그 출력
+            Log.e("PostRequestError", "POST 요청 실패", e);
+            return 0;
+        }
+    }
+
     private void sendPostRequest() {
         String urlString = "https://" + getString(R.string.server_ip) + ":8443/api/question/sign";  // 서버 URL
         String username = emailEditText.getText().toString().trim();  // 이메일 입력값
@@ -247,10 +305,8 @@ public class sign extends AppCompatActivity {
                 Log.e("PostRequestError", "POST 요청 실패: 응답 코드 " + responseCode);
             }
 
-            conn.disconnect();
         } catch (Exception e) {
             // 예외 발생 시 로그 출력
             Log.e("PostRequestError", "POST 요청 실패", e);
         }
-    }
-}
+    }}
