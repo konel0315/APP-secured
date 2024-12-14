@@ -1,6 +1,5 @@
 package com.example.basicapp;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,7 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.CheckBox;
-import androidx.activity.EdgeToEdge;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.BufferedReader;
@@ -27,7 +26,6 @@ public class sign extends AppCompatActivity {
     private EditText emailEditText;
     private EditText passwordEditText;
     private CheckBox idCheckBox;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +52,15 @@ public class sign extends AppCompatActivity {
             }
 
             // 중복 아이디 확인
-            if (duplipost() == 1) {
-                new Thread(this::sendPostRequest).start();
-            }
+            duplipost((isValid, username) -> {
+                if (isValid) {
+                    // 중복되지 않으면 회원가입 요청
+                    new Thread(this::sendPostRequest).start();
+                } else {
+                    // 중복된 아이디일 경우
+                    Toast.makeText(sign.this, "중복된 아이디입니다.", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         idCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -81,12 +85,10 @@ public class sign extends AppCompatActivity {
     private String validatePassword(String password) {
         StringBuilder message = new StringBuilder();
 
-        // 비밀번호 길이 확인
         if (password.length() < 10) {
             message.append("비밀번호는 최소 10자리 이상이어야 합니다.\n");
         }
 
-        // 문자 종류 확인
         boolean hasUppercase = password.matches(".*[A-Z].*");
         boolean hasLowercase = password.matches(".*[a-z].*");
         boolean hasDigit = password.matches(".*\\d.*");
@@ -102,7 +104,6 @@ public class sign extends AppCompatActivity {
             message.append("비밀번호는 두 종류 이상의 문자(대문자, 소문자, 숫자, 특수문자)를 포함해야 합니다.\n");
         }
 
-        // 숫자로만 구성되었는지 확인
         if (password.matches("^\\d+$")) {
             message.append("비밀번호는 숫자로만 구성될 수 없습니다.\n");
         }
@@ -114,38 +115,30 @@ public class sign extends AppCompatActivity {
         String urlString = "https://" + getString(R.string.server_ip) + ":8443/api/question/check";  // 서버 URL
         String username = emailEditText.getText().toString().trim();  // 이메일 입력값
 
-        // JSON 데이터 생성
         String jsonData = "{\n" +
                 "    \"username\": \"" + username + "\"\n" +
                 "}";
 
         try {
-            // 서버 URL 연결
             URL url = new URL(urlString);
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-
-            // SSLContext 설정 (서버 인증서를 신뢰하도록)
             SSLContext sslContext = SSLUtill.createSSLContext(sign.this);
             if (sslContext != null) {
                 conn.setSSLSocketFactory(sslContext.getSocketFactory());
             }
-            conn.setHostnameVerifier((hostname, session) -> true); // 호스트 이름 검증 비활성화
-            // HTTP 요청 설정
+            conn.setHostnameVerifier((hostname, session) -> true);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json; utf-8");
             conn.setRequestProperty("Authorization", "your-fixed-secret-key-12345");
-            conn.setDoOutput(true);  // Output stream 사용
+            conn.setDoOutput(true);
 
-            // JSON 데이터 전송
             OutputStream os = conn.getOutputStream();
-            os.write(jsonData.getBytes(StandardCharsets.UTF_8));  // UTF-8로 인코딩하여 전송
+            os.write(jsonData.getBytes(StandardCharsets.UTF_8));
             os.flush();
             os.close();
 
-            // 응답 코드 확인
             int responseCode = conn.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // 서버 응답 처리
                 InputStream inputStream = conn.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                 StringBuilder response = new StringBuilder();
@@ -155,134 +148,55 @@ public class sign extends AppCompatActivity {
                 }
                 reader.close();
 
-                // 서버 응답을 확인하고, 성공 메시지 표시
                 runOnUiThread(() -> {
                     if (response.toString().equals("0")) {
-                        // 아이디가 중복되지 않음 (선택된 상태 유지)
-                        idCheckBox.setChecked(true);
+                        idCheckBox.setChecked(true); // 아이디가 중복되지 않으면 체크
                     } else {
-                        // 아이디가 중복되면 체크박스 상태 해제
-                        idCheckBox.setChecked(false);
+                        idCheckBox.setChecked(false); // 아이디가 중복되면 체크 해제
                         Toast.makeText(sign.this, "중복된 id입니다.", Toast.LENGTH_SHORT).show();
                     }
                     idCheckBox.setEnabled(true); // 요청이 완료되면 체크박스를 다시 활성화
                 });
             } else {
-                // 응답 실패
                 Log.e("PostRequestError", "POST 요청 실패: 응답 코드 " + responseCode);
             }
-
             conn.disconnect();
         } catch (Exception e) {
-            // 예외 발생 시 로그 출력
             Log.e("PostRequestError", "POST 요청 실패", e);
-        }
-    }
-
-    private int duplipost() {
-        String urlString = "https://" + getString(R.string.server_ip) + ":8443/api/question/token";  // 서버 URL
-        String username = emailEditText.getText().toString().trim();  // 이메일 입력값
-
-        // JSON 데이터 생성
-        String jsonData = "{\n" +
-                "    \"username\": \"" + username + "\"\n" +
-                "}";
-
-        try {
-            // 서버 URL 연결
-            URL url = new URL(urlString);
-            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-
-            // SSLContext 설정 (서버 인증서를 신뢰하도록)
-            SSLContext sslContext = SSLUtill.createSSLContext(sign.this);
-            if (sslContext != null) {
-                conn.setSSLSocketFactory(sslContext.getSocketFactory());
-            }
-
-            conn.setHostnameVerifier((hostname, session) -> true); // 호스트 이름 검증 비활성화
-            // HTTP 요청 설정
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json; utf-8");
-            conn.setRequestProperty("Authorization", "your-fixed-secret-key-12345");
-            conn.setDoOutput(true);  // Output stream 사용
-
-            // JSON 데이터 전송
-            OutputStream os = conn.getOutputStream();
-            os.write(jsonData.getBytes(StandardCharsets.UTF_8));  // UTF-8로 인코딩하여 전송
-            os.flush();
-            os.close();
-
-            // 응답 코드 확인
-            int responseCode = conn.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                // 서버 응답 처리
-                InputStream inputStream = conn.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-                reader.close();
-
-                // 서버 응답을 확인하고, 성공 메시지 표시
-                if (response.toString().equals("0")) {
-                    return 1;  // 중복되지 않으면 1 반환
-                } else {
-                    return 0;  // 중복되면 0 반환
-                }
-            } else {
-                // 응답 실패
-                Log.e("PostRequestError", "POST 요청 실패: 응답 코드 " + responseCode);
-                return 0;
-            }
-
-        } catch (Exception e) {
-            // 예외 발생 시 로그 출력
-            Log.e("PostRequestError", "POST 요청 실패", e);
-            return 0;
         }
     }
 
     private void sendPostRequest() {
         String urlString = "https://" + getString(R.string.server_ip) + ":8443/api/question/sign";  // 서버 URL
-        String username = emailEditText.getText().toString().trim();  // 이메일 입력값
-        String password = passwordEditText.getText().toString().trim();  // 비밀번호 입력값
+        String username = emailEditText.getText().toString().trim();
+        String password = passwordEditText.getText().toString().trim();
 
-        // JSON 데이터 생성
         String jsonData = "{\n" +
                 "    \"username\": \"" + username + "\",\n" +
                 "    \"password\": \"" + password + "\"\n" +
                 "}";
 
         try {
-            // 서버 URL 연결
             URL url = new URL(urlString);
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-
-            // SSLContext 설정 (서버 인증서를 신뢰하도록)
             SSLContext sslContext = SSLUtill.createSSLContext(sign.this);
             if (sslContext != null) {
                 conn.setSSLSocketFactory(sslContext.getSocketFactory());
             }
 
-            conn.setHostnameVerifier((hostname, session) -> true); // 호스트 이름 검증 비활성화
-            // HTTP 요청 설정
+            conn.setHostnameVerifier((hostname, session) -> true);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json; utf-8");
             conn.setRequestProperty("Authorization", "your-fixed-secret-key-12345");
-            conn.setDoOutput(true);  // Output stream 사용
+            conn.setDoOutput(true);
 
-            // JSON 데이터 전송
             OutputStream os = conn.getOutputStream();
-            os.write(jsonData.getBytes(StandardCharsets.UTF_8));  // UTF-8로 인코딩하여 전송
+            os.write(jsonData.getBytes(StandardCharsets.UTF_8));
             os.flush();
             os.close();
 
-            // 응답 코드 확인
             int responseCode = conn.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // 서버 응답 처리
                 InputStream inputStream = conn.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                 StringBuilder response = new StringBuilder();
@@ -292,21 +206,67 @@ public class sign extends AppCompatActivity {
                 }
                 reader.close();
 
-                // 서버 응답을 확인하고, 성공 메시지 표시
                 if (response.toString().equals("0")) {
-                    // 회원가입 성공 시 종료
-                    finish();
+                    finish(); // 회원가입 성공 시 종료
                 } else {
-                    // 응답이 0이 아닌 경우 다른 처리
                     Log.e("PostRequestError", "서버 응답: " + response.toString());
                 }
             } else {
-                // 응답 실패
                 Log.e("PostRequestError", "POST 요청 실패: 응답 코드 " + responseCode);
             }
 
         } catch (Exception e) {
-            // 예외 발생 시 로그 출력
             Log.e("PostRequestError", "POST 요청 실패", e);
         }
-    }}
+    }
+
+    private void duplipost(ValidationCallback callback) {
+        String urlString = "https://" + getString(R.string.server_ip) + ":8443/api/question/check";
+        String username = emailEditText.getText().toString().trim();
+
+        String jsonData = "{\n" +
+                "    \"username\": \"" + username + "\"\n" +
+                "}";
+
+        new Thread(() -> {
+            try {
+                URL url = new URL(urlString);
+                HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+                SSLContext sslContext = SSLUtill.createSSLContext(sign.this);
+                if (sslContext != null) {
+                    conn.setSSLSocketFactory(sslContext.getSocketFactory());
+                }
+                conn.setHostnameVerifier((hostname, session) -> true);
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json; utf-8");
+                conn.setRequestProperty("Authorization", "your-fixed-secret-key-12345");
+                conn.setDoOutput(true);
+
+                OutputStream os = conn.getOutputStream();
+                os.write(jsonData.getBytes(StandardCharsets.UTF_8));
+                os.flush();
+                os.close();
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = conn.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+                    reader.close();
+
+                    runOnUiThread(() -> callback.onValidationResult(response.toString().equals("0"), username));
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("PostRequestError", "POST 요청 실패", e);
+            }
+        }).start();
+    }
+    public interface ValidationCallback {
+        void onValidationResult(boolean isValid, String username);  // 중복 여부와 사용자명을 전달
+    }
+}
