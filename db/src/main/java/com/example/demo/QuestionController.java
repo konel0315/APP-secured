@@ -94,22 +94,21 @@ public class QuestionController {
 
     // 토큰 검증 API (POST)
     @PostMapping("/token")
-    public ResponseEntity<Integer> verifyToken(
-    		@RequestBody String token,
+    public ResponseEntity<String> verifyToken(
+            @RequestBody String token,
             @RequestHeader(value = "Authorization", required = false) String fixedToken) {
 
         // 1. 고정된 Authorization 토큰 검증
         if (fixedToken == null || !fixedToken.equals(FIXED_TOKEN)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(1); // 인증 실패
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden"); // 인증 실패
         }
 
         // 2. 클라이언트로부터 받은 토큰 검증
         Optional<String> usernameOpt = JwtT.verifyToken(token);
 
         if (usernameOpt.isPresent()) {
-            return ResponseEntity.ok(0); // 토큰 유효
+            String username = usernameOpt.get(); // 유효한 토큰에서 username을 가져옴
+            return ResponseEntity.ok(username); // 토큰 유효하고, username 반환
         } else {
-            return ResponseEntity.ok(1); // 토큰 무효
-        }
-    }
-}//pproject.duckdns.org
+            return ResponseEntity.ok("Invalid token"); // 토큰 무효
+        }}}//pproject.duckdns.org

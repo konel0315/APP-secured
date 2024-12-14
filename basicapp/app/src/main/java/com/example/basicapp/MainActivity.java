@@ -11,8 +11,6 @@ import android.widget.Button;
 import android.content.Intent;
 import android.widget.Toast;
 
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -50,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
             if (token == null || token.isEmpty()) {
                 navigateToLogin();
             } else {
-                verifyToken(token, isValid -> {
+                verifyToken(token, (isValid, username) -> {
                     if (isValid) {
                         navigateToLogout();
                     } else {
@@ -63,19 +61,22 @@ public class MainActivity extends AppCompatActivity {
         b2.setOnClickListener(view -> {
             String token = tokenStorage.getToken(); // 클릭 시마다 최신 토큰을 가져오기
             Log.d("MainActivity", "token : " + token);
+
             if (token == null || token.isEmpty()) {
                 Toast.makeText(getApplicationContext(), "토큰이 없습니다. 로그인해주세요.", Toast.LENGTH_SHORT).show();
             } else {
-                verifyToken(token, isValid -> {
+                verifyToken(token, (isValid, username) -> {
                     if (isValid) {
+                        // username이 유효한 경우
+                        Log.d("MainActivity", "유효한 사용자: " + username);
                         navigateToWebSocketActivity();
                     } else {
+                        // 유효하지 않은 경우
                         Toast.makeText(getApplicationContext(), "토큰이 유효하지 않습니다. 로그인해주세요.", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
         });
-
 
         b3.setOnClickListener(view -> navigateToPayment());
     }
@@ -136,21 +137,25 @@ public class MainActivity extends AppCompatActivity {
                     }
                     reader.close();
 
-                    boolean isValid = "0".equals(response.toString().trim());
-                    runOnUiThread(() -> callback.onValidationResult(isValid));
+                    // 서버 응답에서 username을 추출
+                    String username = response.toString().trim(); // 서버 응답에서 실제 username 추출
+
+                    // username이 null이 아니면 유효한 토큰으로 판단
+                    boolean isValid = (username != null && !username.isEmpty());
+                    runOnUiThread(() -> callback.onValidationResult(isValid, username)); // username과 isValid를 콜백으로 전달
                 } else {
                     Log.e("VerifyTokenError", "POST 요청 실패: 응답 코드 " + responseCode);
-                    runOnUiThread(() -> callback.onValidationResult(false));
+                    runOnUiThread(() -> callback.onValidationResult(false, null));
                 }
 
             } catch (Exception e) {
                 Log.e("VerifyTokenException", "토큰 검증 중 오류 발생", e);
-                runOnUiThread(() -> callback.onValidationResult(false));
+                runOnUiThread(() -> callback.onValidationResult(false, null));
             }
         }).start();
     }
 
     interface TokenValidationCallback {
-        void onValidationResult(boolean isValid);
+        void onValidationResult(boolean isValid, String username);  // username도 함께 반환
     }
 }
