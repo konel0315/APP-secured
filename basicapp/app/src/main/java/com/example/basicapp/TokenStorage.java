@@ -40,16 +40,22 @@ public class TokenStorage extends SQLiteOpenHelper {
     }
 
     // 토큰 저장 메서드
+    // 토큰 저장 메서드
     public long saveToken(String username, String token) {
         SQLiteDatabase db = this.getWritableDatabase();  // 쓰기 가능한 데이터베이스 열기
 
+        // 모든 기존 데이터 삭제
+        clearToken();
+
+        // 새로운 토큰 값을 저장
         ContentValues values = new ContentValues();  // 새로운 ContentValues 객체 생성
         values.put(COLUMN_USERNAME, username);  // 사용자명 저장
         values.put(COLUMN_TOKEN, token);  // 토큰 저장
 
-        // 이미 존재하는 데이터가 있으면 업데이트하고, 없으면 새로 삽입
-        return db.insertWithOnConflict(TABLE_TOKENS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        // 새로 삽입
+        return db.insert(TABLE_TOKENS, null, values);
     }
+
 
     // 토큰 가져오기
     public String getToken() {

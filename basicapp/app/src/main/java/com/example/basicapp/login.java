@@ -125,6 +125,8 @@ public class login extends AppCompatActivity {
                     String token = jsonResponse.getString("token");  // 'token'이라는 키에서 값 추출
                     String user = jsonResponse.getString("username");
                     tokenStorage.saveToken(user,token);
+                    String k=tokenStorage.getToken();
+                    Log.d("MainActivity", "token : " + k);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

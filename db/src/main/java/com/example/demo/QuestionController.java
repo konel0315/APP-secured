@@ -72,7 +72,6 @@ public class QuestionController {
         }
     }
 
-
     // 사용자 인증 후 질문 확인 (POST)
     @PostMapping("/check")
     public int check(
@@ -92,4 +91,25 @@ public class QuestionController {
             return 0; // 사용자 없음
         }
     }
-}
+
+    // 토큰 검증 API (POST)
+    @PostMapping("/token")
+    public ResponseEntity<Integer> verifyToken(
+    		@RequestBody String token,
+            @RequestHeader(value = "Authorization", required = false) String fixedToken) {
+
+        // 1. 고정된 Authorization 토큰 검증
+        if (fixedToken == null || !fixedToken.equals(FIXED_TOKEN)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(1); // 인증 실패
+        }
+
+        // 2. 클라이언트로부터 받은 토큰 검증
+        Optional<String> usernameOpt = JwtT.verifyToken(token);
+
+        if (usernameOpt.isPresent()) {
+            return ResponseEntity.ok(0); // 토큰 유효
+        } else {
+            return ResponseEntity.ok(1); // 토큰 무효
+        }
+    }
+}//pproject.duckdns.org

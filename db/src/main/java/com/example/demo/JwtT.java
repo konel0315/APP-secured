@@ -7,6 +7,7 @@ import com.auth0.jwt.interfaces.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 
 import java.util.Date;
+import java.util.Optional;
 
 public class JwtT {
 
@@ -29,24 +30,28 @@ public class JwtT {
                 .withExpiresAt(expiryDate)      // 만료 시간
                 .sign(Algorithm.HMAC256(SECRET_KEY)); // HMAC256 알고리즘으로 서명
     }
-    public static String verifyToken(String token) {
+
+    /**
+     * JWT 토큰 검증
+     *
+     * @param token 클라이언트가 제공한 JWT 토큰
+     * @return 유효한 경우 사용자 이름, 유효하지 않은 경우 Optional.empty()
+     */
+    public static Optional<String> verifyToken(String token) {
         try {
             // JWT 생성시 사용한 비밀 키로 서명을 검증
             Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
-            JWTVerifier verifier = JWT.require(algorithm)
-                    .build();  // JWT 검증기 생성
+            JWTVerifier verifier = JWT.require(algorithm).build();
 
             // 토큰 검증
             DecodedJWT decodedJWT = verifier.verify(token);
 
-            // 토큰이 유효하면 디코딩된 JWT 객체를 반환합니다
-            String k=decodedJWT.getSubject();
-
-            return k;  // 토큰이 유효함
+            // 검증 성공 시 사용자 이름 반환
+            return Optional.of(decodedJWT.getSubject());
         } catch (JWTVerificationException exception) {
             // 서명 검증 실패 등
             System.out.println("Invalid token: " + exception.getMessage());
-            return exception.getMessage();  // 토큰이 유효하지 않음
+            return Optional.empty();  // 토큰이 유효하지 않음
         }
     }
 }
