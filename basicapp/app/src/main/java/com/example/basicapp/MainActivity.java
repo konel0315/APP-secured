@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
         b1.setOnClickListener(view -> {
             String token = tokenStorage.getToken(); // 클릭 시마다 최신 토큰을 가져오기
+            String nameN = tokenStorage.getUsername();
             Log.d("MainActivity", "token : " + token);
 
             if (token == null || token.isEmpty()) {

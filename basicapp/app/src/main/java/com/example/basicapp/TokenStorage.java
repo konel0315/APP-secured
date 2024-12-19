@@ -1,15 +1,16 @@
 package com.example.basicapp;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteOpenHelper;
 import android.content.ContentValues;
-import android.database.Cursor;
+import net.sqlcipher.Cursor;
 
 public class TokenStorage extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "tokens.db";  // 데이터베이스 이름
     private static final int DATABASE_VERSION = 1;  // 데이터베이스 버전
+    private static final String DATABASE_PASSWORD = "your_secure_password"; // 암호화 키
 
     // 테이블 이름과 컬럼 정의
     public static final String TABLE_TOKENS = "tokens";
@@ -20,6 +21,7 @@ public class TokenStorage extends SQLiteOpenHelper {
     // 생성자: 데이터베이스 초기화
     public TokenStorage(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        SQLiteDatabase.loadLibs(context); // SQLCipher 라이브러리 초기화
     }
 
     @Override
@@ -39,7 +41,15 @@ public class TokenStorage extends SQLiteOpenHelper {
         onCreate(db);  // 새로 테이블을 생성
     }
 
-    // 토큰 저장 메서드
+    // 데이터베이스 암호화에 필요하므로 `getWritableDatabase`와 `getReadableDatabase`를 오버라이드
+    public SQLiteDatabase getWritableDatabase() {
+        return super.getWritableDatabase(DATABASE_PASSWORD); // 암호화된 데이터베이스 열기
+    }
+
+    public SQLiteDatabase getReadableDatabase() {
+        return super.getReadableDatabase(DATABASE_PASSWORD); // 암호화된 데이터베이스 열기
+    }
+
     // 토큰 저장 메서드
     public long saveToken(String username, String token) {
         SQLiteDatabase db = this.getWritableDatabase();  // 쓰기 가능한 데이터베이스 열기
@@ -53,9 +63,10 @@ public class TokenStorage extends SQLiteOpenHelper {
         values.put(COLUMN_TOKEN, token);  // 토큰 저장
 
         // 새로 삽입
-        return db.insert(TABLE_TOKENS, null, values);
+        long result = db.insert(TABLE_TOKENS, null, values);
+        db.close(); // 데이터베이스 닫기
+        return result;
     }
-
 
     // 토큰 가져오기
     public String getToken() {
@@ -99,5 +110,6 @@ public class TokenStorage extends SQLiteOpenHelper {
     public void clearToken() {
         SQLiteDatabase db = this.getWritableDatabase();  // 쓰기 가능한 데이터베이스 열기
         db.delete(TABLE_TOKENS, null, null);  // 테이블의 모든 레코드 삭제
+        db.close(); // 데이터베이스 닫기
     }
 }

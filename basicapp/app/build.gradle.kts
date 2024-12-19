@@ -43,4 +43,5 @@ dependencies {
     implementation ("com.squareup.okhttp3:okhttp:4.10.0")
     implementation ("com.github.iamport:iamport-rest-client-java:0.2.23")
     implementation ("com.google.android.gms:play-services-safetynet:17.0.0")
+    implementation ("net.zetetic:android-database-sqlcipher:4.5.3@aar")
 }
